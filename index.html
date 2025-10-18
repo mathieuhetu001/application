@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi de progression - Univers social Sec. 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+
+        .controls h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #555;
+            min-width: 120px;
+        }
+
+        input, select, button {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        button {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .group-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            border: 2px solid #f0f0f0;
+            overflow: hidden;
+        }
+
+        .group-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+        }
+
+        .group-header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .group-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .rename-btn {
+            background: rgba(255,255,255,0.2) !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            padding: 5px 10px !important;
+            border-radius: 15px !important;
+            font-size: 0.8rem !important;
+            transform: none !important;
+        }
+
+        .group-content {
+            padding: 20px;
+        }
+
+        .chapter-name {
+            background: linear-gradient(135deg, #27ae60 0%, #219a52 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            background: #ecf0f1;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+
+        .periode-nav {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .periode-nav h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .periode-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .periode-btn {
+            background: #2196f3 !important;
+            color: white !important;
+            border: 1px solid #1976d2 !important;
+            padding: 5px 10px !important;
+            border-radius: 4px !important;
+            font-size: 0.75rem !important;
+            min-width: 30px !important;
+            cursor: pointer !important;
+            transform: none !important;
+        }
+
+        .periode-btn.active {
+            background: #ff9800 !important;
+            border-color: #f57c00 !important;
+        }
+
+        .adjust-periode {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .adjust-btn {
+            background: #4caf50 !important;
+            border: none !important;
+            color: white !important;
+            padding: 5px 10px !important;
+            font-size: 0.8rem !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            transform: none !important;
+        }
+
+        .adjust-btn.remove {
+            background: #f44336 !important;
+        }
+
+        .periode-count {
+            color: #2e7d32;
+            font-weight: 600;
+            min-width: 70px;
+        }
+
+        .note-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .note-section.empty {
+            background: #f8f9fa;
+            border: 1px dashed #dee2e6;
+            color: #6c757d;
+        }
+
+        .note-text {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .note-btn {
+            background: #ffd32a !important;
+            color: #856404 !important;
+            border: 1px solid #ffc107 !important;
+            padding: 5px 10px !important;
+            font-size: 0.8rem !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            transform: none !important;
+        }
+
+        .controls-section {
+            display: flex;
+            gap: 10px;
+        }
+
+        .controls-section button {
+            flex: 1;
+            padding: 8px;
+            font-size: 0.85rem;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%) !important;
+        }
+
+        .btn-complete {
+            background: linear-gradient(135deg, #27ae60 0%, #219a52 100%) !important;
+        }
+
+        .no-chapter {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .chapters-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .chapters-list h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .chapter-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+
+        .chapter-item.histoire {
+            border-left-color: #e74c3c;
+        }
+
+        .chapter-item.geographie {
+            border-left-color: #27ae60;
+        }
+
+        .delete-btn {
+            background: #e74c3c !important;
+            color: white !important;
+            border: none !important;
+            padding: 5px 10px !important;
+            border-radius: 4px !important;
+            font-size: 0.8rem !important;
+            cursor: pointer !important;
+        }
+
+        .export-import {
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Suivi de progression</h1>
+            <p>Univers social - Secondaire 2</p>
+        </div>
+
+        <div class="main-content">
+            <div class="controls">
+                <h3>🎯 Créer un chapitre</h3>
+                
+                <div class="form-group">
+                    <label>Matière :</label>
+                    <select id="matiere">
+                        <option value="histoire">Histoire</option>
+                        <option value="geographie">Géographie</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Nom :</label>
+                    <input type="text" id="nomChapitre" placeholder="Ex: La Nouvelle-France">
+                </div>
+
+                <div class="form-group">
+                    <label>Périodes :</label>
+                    <input type="number" id="nbPeriodes" min="1" max="20" value="6">
+                    <button onclick="creerChapitre()">➕ Ajouter</button>
+                </div>
+
+                <div class="export-import">
+                    <div class="form-group">
+                        <label>Sauvegarde :</label>
+                        <button onclick="exporter()" style="background: linear-gradient(135deg, #27ae60 0%, #219a52 100%);">📤 Exporter</button>
+                        <button onclick="importer()" style="background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);">📥 Importer</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="groupes" class="groups-grid"></div>
+
+            <div class="chapters-list">
+                <h3>📋 Chapitres</h3>
+                <div id="listChapitres"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chapitres = [];
+        let groupes = [
+            { nom: "Groupe 02", chapitreId: null, periodeCourante: 0, periodesParChapitre: {}, notes: {} },
+            { nom: "Groupe 22", chapitreId: null, periodeCourante: 0, periodesParChapitre: {}, notes: {} },
+            { nom: "Groupe 23", chapitreId: null, periodeCourante: 0, periodesParChapitre: {}, notes: {} },
+            { nom: "Groupe 24", chapitreId: null, periodeCourante: 0, periodesParChapitre: {}, notes: {} },
+            { nom: "Groupe 25", chapitreId: null, periodeCourante: 0, periodesParChapitre: {}, notes: {} }
+        ];
+
+        function sauvegarder() {
+            localStorage.setItem('chapitres', JSON.stringify(chapitres));
+            localStorage.setItem('groupes', JSON.stringify(groupes));
+        }
+
+        function charger() {
+            try {
+                const c = localStorage.getItem('chapitres');
+                const g = localStorage.getItem('groupes');
+                if (c) chapitres = JSON.parse(c);
+                if (g) {
+                    const groupesChargees = JSON.parse(g);
+                    groupes = groupesChargees.map(groupe => ({
+                        nom: groupe.nom || 'Groupe',
+                        chapitreId: groupe.chapitreId || null,
+                        periodeCourante: groupe.periodeCourante || 0,
+                        periodesParChapitre: groupe.periodesParChapitre || {},
+                        notes: groupe.notes || {}
+                    }));
+                }
+            } catch (e) {
+                console.error('Erreur chargement:', e);
+            }
+            afficher();
+        }
+
+        function creerChapitre() {
+            const matiere = document.getElementById('matiere').value;
+            const nom = document.getElementById('nomChapitre').value.trim();
+            const nb = parseInt(document.getElementById('nbPeriodes').value);
+            if (!nom) {
+                alert('Entrez un nom de chapitre');
+                return;
+            }
+            chapitres.push({
+                id: Date.now(),
+                matiere,
+                nom,
+                nbPeriodes: nb
+            });
+            document.getElementById('nomChapitre').value = '';
+            document.getElementById('nbPeriodes').value = 6;
+            sauvegarder();
+            afficher();
+        }
+
+        function supprimerChapitre(id) {
+            if (!confirm('Supprimer ce chapitre ?')) return;
+            chapitres = chapitres.filter(c => c.id !== id);
+            groupes.forEach(g => {
+                if (g.chapitreId === id) {
+                    g.chapitreId = null;
+                    g.periodeCourante = 0;
+                    delete g.periodesParChapitre[id];
+                    g.notes = {};
+                }
+            });
+            sauvegarder();
+            afficher();
+        }
+
+        function changerNomGroupe(index) {
+            const nouveau = prompt('Nouveau nom :', groupes[index].nom);
+            if (nouveau && nouveau.trim()) {
+                groupes[index].nom = nouveau.trim();
+                sauvegarder();
+                afficher();
+            }
+        }
+
+        function assignerChapitre(indexGroupe, chapitreId) {
+            if (!chapitreId) return;
+            const chapitre = chapitres.find(c => c.id === parseInt(chapitreId));
+            if (!chapitre) return;
+            const chapIdNum = parseInt(chapitreId);
+            groupes[indexGroupe].chapitreId = chapIdNum;
+            groupes[indexGroupe].periodeCourante = 1;
+            if (!groupes[indexGroupe].periodesParChapitre[chapIdNum]) {
+                groupes[indexGroupe].periodesParChapitre[chapIdNum] = chapitre.nbPeriodes;
+            }
+            sauvegarder();
+            afficher();
+        }
+
+        function allerPeriode(indexGroupe, num) {
+            console.log('ALLERPERIODE APPEL:', 'indexGroupe=', indexGroupe, 'num=', num);
+            const groupe = groupes[indexGroupe];
+            console.log('groupe:', groupe);
+            if (!groupe || !groupe.chapitreId) {
+                console.log('Pas de groupe ou chapitreId');
+                return;
+            }
+            const nbPeriodes = groupe.periodesParChapitre[groupe.chapitreId];
+            console.log('nbPeriodes:', nbPeriodes, 'periodesParChapitre:', groupe.periodesParChapitre);
+            if (num >= 1 && num <= nbPeriodes) {
+                groupe.periodeCourante = num;
+                console.log('Nouvelle période:', num);
+                sauvegarder();
+                afficher();
+            } else {
+                console.log('Numéro invalide:', num, 'max:', nbPeriodes);
+            }
+        }
+
+        function augmenterPeriodes(indexGroupe) {
+            const groupe = groupes[indexGroupe];
+            if (!groupe || !groupe.chapitreId) return;
+            const nb = groupe.periodesParChapitre[groupe.chapitreId];
+            if (nb < 20) {
+                groupe.periodesParChapitre[groupe.chapitreId] = nb + 1;
+                sauvegarder();
+                afficher();
+            }
+        }
+
+        function diminuerPeriodes(indexGroupe) {
+            const groupe = groupes[indexGroupe];
+            if (!groupe || !groupe.chapitreId) return;
+            const nb = groupe.periodesParChapitre[groupe.chapitreId];
+            if (nb > 1) {
+                groupe.periodesParChapitre[groupe.chapitreId] = nb - 1;
+                const cleNote = `${groupe.chapitreId}-${nb}`;
+                delete groupe.notes[cleNote];
+                if (groupe.periodeCourante > nb - 1) {
+                    groupe.periodeCourante = nb - 1;
+                }
+                sauvegarder();
+                afficher();
+            }
+        }
+
+        function ajouterNote(indexGroupe) {
+            const groupe = groupes[indexGroupe];
+            if (!groupe || !groupe.chapitreId) return;
+            const chapitre = chapitres.find(c => c.id === groupe.chapitreId);
+            if (!chapitre) return;
+            const cle = `${groupe.chapitreId}-${groupe.periodeCourante}`;
+            const noteActuelle = groupe.notes[cle] || '';
+            const nouvelle = prompt(`Note pour "${chapitre.nom}" - Période ${groupe.periodeCourante} :`, noteActuelle);
+            if (nouvelle === null) return;
+            if (nouvelle.trim() === '') {
+                delete groupe.notes[cle];
+            } else {
+                groupe.notes[cle] = nouvelle.trim();
+            }
+            sauvegarder();
+            afficher();
+        }
+
+        function obtenirNote(indexGroupe) {
+            const groupe = groupes[indexGroupe];
+            if (!groupe || !groupe.chapitreId) return '';
+            const cle = `${groupe.chapitreId}-${groupe.periodeCourante}`;
+            return groupe.notes[cle] || '';
+        }
+
+        function avancerPeriode(indexGroupe) {
+            const groupe = groupes[indexGroupe];
+            if (!groupe || !groupe.chapitreId) return;
+            const nb = groupe.periodesParChapitre[groupe.chapitreId];
+            if (groupe.periodeCourante < nb) {
+                groupe.periodeCourante++;
+                sauvegarder();
+                afficher();
+            }
+        }
+
+        function terminerChapitre(indexGroupe) {
+            const groupe = groupes[indexGroupe];
+            if (!groupe || !groupe.chapitreId) return;
+            const nb = groupe.periodesParChapitre[groupe.chapitreId];
+            groupe.periodeCourante = nb;
+            sauvegarder();
+            afficher();
+        }
+
+        function chapitreSuivant(indexGroupe) {
+            groupes[indexGroupe].chapitreId = null;
+            groupes[indexGroupe].periodeCourante = 0;
+            sauvegarder();
+            afficher();
+        }
+
+        function exporter() {
+            const data = { chapitres, groupes, date: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'univers_social.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importer() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        if (!data.chapitres || !data.groupes) {
+                            alert('Format invalide');
+                            return;
+                        }
+                        if (confirm('Remplacer toutes les données ?')) {
+                            chapitres = Array.isArray(data.chapitres) ? data.chapitres : [];
+                            
+                            groupes = Array.isArray(data.groupes) ? data.groupes.map(g => {
+                                // Convertir ancien format au nouveau
+                                const chapId = g.chapitreId !== undefined ? g.chapitreId : g.chapitreActuel;
+                                const periodeCour = g.periodeCourante !== undefined ? g.periodeCourante : g.periodeActuelle;
+                                
+                                // CRÉER periodesParChapitre à partir des chapitres
+                                let periodesParChap = {};
+                                if (chapId) {
+                                    const chapitre = chapitres.find(c => c.id === chapId);
+                                    if (chapitre) {
+                                        periodesParChap[chapId] = chapitre.nbPeriodes;
+                                    }
+                                }
+                                
+                                console.log('Import groupe:', g.nom, 'chapId:', chapId, 'periode:', periodeCour, 'periodesParChap:', periodesParChap);
+                                
+                                return {
+                                    nom: g.nom || 'Groupe',
+                                    chapitreId: chapId,
+                                    periodeCourante: periodeCour,
+                                    periodesParChapitre: periodesParChap,
+                                    notes: g.notes || {}
+                                };
+                            }) : groupes;
+                            
+                            sauvegarder();
+                            afficher();
+                            alert('Données importées !');
+                        }
+                    } catch (error) {
+                        console.error('Erreur import:', error);
+                        alert('Erreur: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function afficherGroupes() {
+            const container = document.getElementById('groupes');
+            if (!container) return;
+            container.innerHTML = '';
+            groupes.forEach((groupe, idx) => {
+                const chapitre = groupe.chapitreId ? chapitres.find(c => c.id === groupe.chapitreId) : null;
+                const nbPeriodes = chapitre ? (groupe.periodesParChapitre[groupe.chapitreId] || chapitre.nbPeriodes) : 0;
+                const pourcent = nbPeriodes > 0 ? Math.round((groupe.periodeCourante / nbPeriodes) * 100) : 0;
+                const note = obtenirNote(idx);
+                let html = `
+                    <div class="group-card">
+                        <div class="group-header">
+                            <span class="group-name">${groupe.nom}</span>
+                            <button class="rename-btn" onclick="changerNomGroupe(${idx})">✏️</button>
+                        </div>
+                        <div class="group-content">
+                `;
+                if (!chapitre) {
+                    html += `
+                        <div class="no-chapter">Aucun chapitre assigné</div>
+                        <select onchange="assignerChapitre(${idx}, this.value)" style="width: 100%; padding: 10px; border-radius: 8px;">
+                            <option value="">Choisir un chapitre...</option>
+                            ${chapitres.map(c => `<option value="${c.id}">${c.matiere === 'histoire' ? '📖' : '🗺️'} ${c.nom} (${c.nbPeriodes}p)</option>`).join('')}
+                        </select>
+                    `;
+                } else {
+                    html += `
+                        <div class="chapter-name">${chapitre.nom}</div>
+                        <div class="progress-info">
+                            <span>Période ${groupe.periodeCourante} / ${nbPeriodes}</span>
+                            <span>${pourcent}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${pourcent}%"></div>
+                        </div>
+                        <div class="periode-nav">
+                            <h4>🔍 Naviguer :</h4>
+                            <div class="periode-buttons">
+                                ${Array.from({length: nbPeriodes}, (_, i) => i + 1).map(n => `<button class="periode-btn ${n === groupe.periodeCourante ? 'active' : ''}" onclick="allerPeriode(${idx}, ${n})">${n}</button>`).join('')}
+                            </div>
+                        </div>
+                        <div class="adjust-periode">
+                            <button class="adjust-btn remove" onclick="diminuerPeriodes(${idx})">➖</button>
+                            <span class="periode-count">${nbPeriodes} Périodes</span>
+                            <button class="adjust-btn" onclick="augmenterPeriodes(${idx})">➕</button>
+                        </div>
+                        <div class="note-section ${note ? '' : 'empty'}">
+                            <div class="note-text">${note ? '📝 ' + note : 'Aucune note'}</div>
+                            <button class="note-btn" onclick="ajouterNote(${idx})">${note ? '✏️ Modifier' : '➕ Ajouter'}</button>
+                        </div>
+                        <div class="controls-section">
+                            ${groupe.periodeCourante < nbPeriodes ? `
+                                <button onclick="avancerPeriode(${idx})">➡️ Suivante</button>
+                                <button class="btn-complete" onclick="terminerChapitre(${idx})">✅ Terminer</button>
+                            ` : `
+                                <button class="btn-next" onclick="chapitreSuivant(${idx})">🎯 Suivant</button>
+                            `}
+                        </div>
+                    `;
+                }
+                html += `</div></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function afficherChapitres() {
+            const container = document.getElementById('listChapitres');
+            if (chapitres.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Aucun chapitre créé</p>';
+                return;
+            }
+            container.innerHTML = chapitres.map(c => `
+                <div class="chapter-item ${c.matiere}">
+                    <div><strong>${c.matiere === 'histoire' ? '📖 Histoire' : '🗺️ Géographie'}</strong> - ${c.nom} (${c.nbPeriodes}p)</div>
+                    <button class="delete-btn" onclick="supprimerChapitre(${c.id})">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function afficher() {
+            afficherGroupes();
+            afficherChapitres();
+        }
+
+        window.addEventListener('load', () => {
+            charger();
+        });
+    </script>
+</body>
+</html>
