@@ -372,10 +372,17 @@
 
                 <div class="export-import">
                     <div class="form-group">
-                        <label>Sauvegarde :</label>
+                        <label>Sauvegarde locale :</label>
                         <button onclick="exporter()" style="background: linear-gradient(135deg, #27ae60 0%, #219a52 100%);">📤 Exporter</button>
                         <button onclick="importer()" style="background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);">📥 Importer</button>
                     </div>
+                    <div class="form-group" style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
+                        <label>URL Google Sheets :</label>
+                        <input type="text" id="scriptUrl" placeholder="Collez votre URL Apps Script ici" style="flex: 1; min-width: 250px;">
+                        <button onclick="connecterGoogleSheets()" style="background: linear-gradient(135deg, #4285f4 0%, #1a73e8 100%);">🔗 Connecter</button>
+                        <button onclick="synchroniser()" style="background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);">🔄 Synchroniser</button>
+                    </div>
+                    <div id="statutSync" style="margin-top: 10px; font-size: 0.85rem; color: #7f8c8d;"></div>
                 </div>
             </div>
 
@@ -397,14 +404,88 @@
             { nom: "Groupe 24", chapitreId: null, periodeCourante: 0, periodesParChapitre: {}, notes: {} },
             { nom: "Groupe 25", chapitreId: null, periodeCourante: 0, periodesParChapitre: {}, notes: {} }
         ];
+        let scriptUrl = '';
+        let syncEnCours = false;
+
+        function afficherStatut(message, couleur) {
+            const el = document.getElementById('statutSync');
+            if (el) {
+                el.textContent = message;
+                el.style.color = couleur || '#7f8c8d';
+            }
+        }
+
+        function connecterGoogleSheets() {
+            const url = document.getElementById('scriptUrl').value.trim();
+            if (!url) {
+                alert('Collez une URL valide');
+                return;
+            }
+            scriptUrl = url;
+            localStorage.setItem('scriptUrl', url);
+            afficherStatut('✅ Connecté ! Synchronisation...', '#27ae60');
+            synchroniser();
+        }
+
+        async function synchroniser() {
+            if (!scriptUrl) {
+                afficherStatut('⚠️ Aucune URL Google Sheets configurée', '#e67e22');
+                return;
+            }
+            if (syncEnCours) return;
+            syncEnCours = true;
+            afficherStatut('🔄 Synchronisation en cours...', '#3498db');
+            try {
+                const reponse = await fetch(scriptUrl);
+                const texte = await reponse.text();
+                const data = JSON.parse(texte);
+                if (data.chapitres && data.groupes) {
+                    chapitres = data.chapitres;
+                    groupes = data.groupes;
+                    afficher();
+                    afficherStatut('✅ Synchronisé avec Google Sheets - ' + new Date().toLocaleTimeString(), '#27ae60');
+                } else {
+                    afficherStatut('ℹ️ Feuille vide, prête à recevoir des données', '#7f8c8d');
+                }
+            } catch (err) {
+                console.error('Erreur sync:', err);
+                afficherStatut('❌ Erreur de connexion à Google Sheets', '#e74c3c');
+            }
+            syncEnCours = false;
+        }
+
+        async function sauvegarderVersSheets() {
+            if (!scriptUrl) return;
+            try {
+                const data = { chapitres, groupes, date: new Date().toISOString() };
+                await fetch(scriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(data)
+                });
+                afficherStatut('✅ Enregistré sur Google Sheets - ' + new Date().toLocaleTimeString(), '#27ae60');
+            } catch (err) {
+                console.error('Erreur sauvegarde sheets:', err);
+                afficherStatut('❌ Erreur d\'enregistrement sur Google Sheets', '#e74c3c');
+            }
+        }
 
         function sauvegarder() {
             localStorage.setItem('chapitres', JSON.stringify(chapitres));
             localStorage.setItem('groupes', JSON.stringify(groupes));
+            if (scriptUrl) {
+                sauvegarderVersSheets();
+            }
         }
 
         function charger() {
             try {
+                const savedUrl = localStorage.getItem('scriptUrl');
+                if (savedUrl) {
+                    scriptUrl = savedUrl;
+                    document.getElementById('scriptUrl').value = savedUrl;
+                }
+
                 const c = localStorage.getItem('chapitres');
                 const g = localStorage.getItem('groupes');
                 if (c) chapitres = JSON.parse(c);
@@ -422,6 +503,10 @@
                 console.error('Erreur chargement:', e);
             }
             afficher();
+
+            if (scriptUrl) {
+                synchroniser();
+            }
         }
 
         function creerChapitre() {
